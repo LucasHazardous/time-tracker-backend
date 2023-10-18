@@ -3,7 +3,6 @@ import { ErrorMsg } from '../config/config';
 import { validationResult } from 'express-validator';
 
 export function sendErrorStatusCode(err: ErrorMsg, res: Response) {
-    console.log(err);
     let status = 500;
     switch (err) {
         case ErrorMsg.authenticationErrorMsg:
@@ -12,6 +11,9 @@ export function sendErrorStatusCode(err: ErrorMsg, res: Response) {
         case ErrorMsg.authorizationErrorMsg:
         case ErrorMsg.accessDeniedErrorMsg:
             status = 403;
+            break;
+        case ErrorMsg.notFound:
+            status = 404;
             break;
         case ErrorMsg.userExistsErrorMsg:
             status = 409;

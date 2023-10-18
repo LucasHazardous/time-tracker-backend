@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 const userRouter = express.Router();
 
-import { login } from "../service/user";
+import { login, logout } from "../service/user";
 import { body, param } from 'express-validator';
 import { minPasswordLength } from '../config/config';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
@@ -26,6 +26,12 @@ userRouter.post(
   }
 );
 
+userRouter.post('/logout', body('token').isString().isHexadecimal(), (req: Request, res: Response) => {
+  if (handleValidationError(req, res)) return;
 
+  logout(req.body.token)
+    .then(() => res.sendStatus(200))
+    .catch((err) => sendErrorStatusCode(err, res));
+});
 
 export default userRouter;

@@ -13,7 +13,8 @@ enum ErrorMsg {
     authorizationErrorMsg = 'Authorization failed',
     authenticationErrorMsg = 'Authentication failed',
     userExistsErrorMsg = 'User already exists',
-    accessDeniedErrorMsg = 'Access denied'
+    accessDeniedErrorMsg = 'Access denied',
+    notFound = 'Target not found'
 }
 
 export {
