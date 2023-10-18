@@ -3,21 +3,21 @@ import { ErrorMsg, adminPassword, adminUsername, session_ttl } from '../config/c
 import prisma from '../db/db';
 import cron from "node-cron";
 
-function generateToken(username: string) {
+function generateToken(username: string): string {
     return crypto
         .createHash('sha512')
         .update(String(Date.now()) + username + Math.random())
         .digest('hex');
 }
 
-function hashPassword(password: string) {
+function hashPassword(password: string): string {
     return crypto
         .createHash('sha512')
         .update(password + process.env.SALT)
         .digest('base64');
 }
 
-async function createAdminIfNeeded() {
+async function createAdminIfNeeded(): Promise<void> {
     if (
         (await prisma.user.count({
             where: {
@@ -36,7 +36,7 @@ async function createAdminIfNeeded() {
 
 createAdminIfNeeded().catch((err) => console.log(err));
 
-export async function login(username: string, password: string) {
+export async function login(username: string, password: string): Promise<string> {
     const hashedPassword = hashPassword(password);
     const user = await prisma.user.findFirst({
         where: {
@@ -66,7 +66,7 @@ export async function login(username: string, password: string) {
     throw ErrorMsg.authenticationErrorMsg;
 }
 
-export async function logout(token: string) {
+export async function logout(token: string): Promise<void> {
     try {
         await prisma.session.delete({
             where: {
@@ -92,3 +92,47 @@ cron.schedule("0 * * * *", async () => {
         }
     });
 });
+
+export async function createUser(username: string, password: string, admin: boolean, token: string): Promise<void> {
+    await authorizeAdmin(token);
+
+    try {
+        await prisma.user.create({
+            data: {
+                username,
+                password: hashPassword(password),
+                admin
+            }
+        });
+    } catch (err: any) {
+        if(err.code === 'P2002') {
+            throw ErrorMsg.userExistsErrorMsg;
+        } else {
+            console.error('Error while attempting to create user:', err);
+        }
+    }
+}
+
+export async function authorizeUser(token: string): Promise<void> {
+    const session = await prisma.session.findFirst({
+        where: {
+            token
+        }
+    });
+    if (!session) throw ErrorMsg.authorizationErrorMsg;
+}
+
+export async function authorizeAdmin(token: string): Promise<void> {
+    const sessionData = await prisma.session.findFirst({
+        where: {
+            token
+        }
+    });
+    if (!sessionData) throw ErrorMsg.authorizationErrorMsg;
+    const userData = await prisma.user.findFirst({
+        where: {
+            id: sessionData.userId
+        }
+    });
+    if (!userData!.admin) throw ErrorMsg.accessDeniedErrorMsg;
+}

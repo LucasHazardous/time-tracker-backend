@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 const userRouter = express.Router();
 
-import { login, logout } from "../service/user";
+import { createUser, login, logout } from "../service/user";
 import { body, param } from 'express-validator';
 import { minPasswordLength } from '../config/config';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
@@ -33,5 +33,22 @@ userRouter.post('/logout', body('token').isString().isHexadecimal(), (req: Reque
     .then(() => res.sendStatus(200))
     .catch((err) => sendErrorStatusCode(err, res));
 });
+
+userRouter.post(
+  '/',
+  body('username').isString(),
+  body('password').isString().isLength({
+    min: minPasswordLength,
+  }),
+  body("admin").isBoolean(),
+  body('token').isString().isHexadecimal(),
+  (req: Request, res: Response) => {
+    if (handleValidationError(req, res)) return;
+
+    createUser(req.body.username, req.body.password, req.body.admin, req.body.token)
+      .then(() => res.sendStatus(200))
+      .catch((err) => sendErrorStatusCode(err, res));
+  }
+);
 
 export default userRouter;
