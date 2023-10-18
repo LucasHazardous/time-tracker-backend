@@ -1,0 +1,46 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id       String  @id @default(uuid())
+    username String  @unique
+    password String
+    admin    Boolean
+
+    sessions  Session[]
+    vacations Vacation[]
+    absences  Absence[]
+}
+
+model Session {
+    token  String   @id
+    userId String
+    user   User     @relation(fields: [userId], references: [id])
+    ttl    DateTime
+}
+
+model Vacation {
+    id String @id @default(uuid())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    category String
+    from     DateTime
+    to       DateTime
+    days     Int
+}
+
+model Absence {
+    id   String   @id @default(uuid())
+    date DateTime
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+}
