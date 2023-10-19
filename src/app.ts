@@ -9,6 +9,7 @@ config();
 
 import rateLimit from 'express-rate-limit';
 import userRouter from './api/user';
+import asbsenceRouter from './api/absence';
 
 const limiter = rateLimit({
     windowMs: requestsTimeFrame,
@@ -32,6 +33,7 @@ app.use(
 app.use(express.json());
 
 app.use('/api/user', userRouter);
+app.use('/api/absence', asbsenceRouter);
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);

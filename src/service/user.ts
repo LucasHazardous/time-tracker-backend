@@ -113,13 +113,14 @@ export async function createUser(username: string, password: string, admin: bool
     }
 }
 
-export async function authorizeUser(token: string): Promise<void> {
+export async function authorizeUser(token: string): Promise<{ token: string; userId: string; ttl: Date; } | void> {
     const session = await prisma.session.findFirst({
         where: {
             token
         }
     });
     if (!session) throw ErrorMsg.authorizationErrorMsg;
+    return session;
 }
 
 export async function authorizeAdmin(token: string): Promise<void> {
