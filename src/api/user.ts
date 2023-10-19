@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 const userRouter = express.Router();
 
-import { createUser, login, logout } from "../service/user";
-import { body, param } from 'express-validator';
+import { createUser, getUserList, login, logout } from "../service/user";
+import { body, header, param } from 'express-validator';
 import { minPasswordLength } from '../config/config';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
 
@@ -26,10 +26,13 @@ userRouter.post(
   }
 );
 
-userRouter.post('/logout', body('token').isString().isHexadecimal(), (req: Request, res: Response) => {
+userRouter.delete('/logout', 
+header("Authorization").isString().contains("Bearer"), (req: Request, res: Response) => {
   if (handleValidationError(req, res)) return;
 
-  logout(req.body.token)
+  const token = req.get("Authorization")!.substring(7);
+
+  logout(token)
     .then(() => res.sendStatus(200))
     .catch((err) => sendErrorStatusCode(err, res));
 });
@@ -41,14 +44,26 @@ userRouter.post(
     min: minPasswordLength,
   }),
   body("admin").isBoolean(),
-  body('token').isString().isHexadecimal(),
+  header("Authorization").isString().contains("Bearer"),
   (req: Request, res: Response) => {
     if (handleValidationError(req, res)) return;
 
-    createUser(req.body.username, req.body.password, req.body.admin, req.body.token)
+    const token = req.get("Authorization")!.substring(7);
+
+    createUser(req.body.username, req.body.password, req.body.admin, token)
       .then(() => res.sendStatus(200))
       .catch((err) => sendErrorStatusCode(err, res));
   }
 );
+
+userRouter.get('/', header("Authorization").isString().contains("Bearer"), (req: Request, res: Response) => {
+  if (handleValidationError(req, res)) return;
+
+  const token = req.get("Authorization")!.substring(7);
+
+  getUserList(token)
+    .then((result) => res.json(result))
+    .catch((err) => sendErrorStatusCode(err, res));
+});
 
 export default userRouter;

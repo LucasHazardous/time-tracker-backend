@@ -105,7 +105,7 @@ export async function createUser(username: string, password: string, admin: bool
             }
         });
     } catch (err: any) {
-        if(err.code === 'P2002') {
+        if (err.code === 'P2002') {
             throw ErrorMsg.userExistsErrorMsg;
         } else {
             console.error('Error while attempting to create user:', err);
@@ -135,4 +135,21 @@ export async function authorizeAdmin(token: string): Promise<void> {
         }
     });
     if (!userData!.admin) throw ErrorMsg.accessDeniedErrorMsg;
+}
+
+export async function getUserList(token: string): Promise<{
+    id: string,
+    username: string,
+    admin: boolean
+}[]> {
+    await authorizeAdmin(token);
+
+    const res = await prisma.user.findMany({
+        select: {
+            id: true,
+            username: true,
+            admin: true
+        }
+    });
+    return res;
 }
