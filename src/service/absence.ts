@@ -7,7 +7,6 @@ import { ErrorMsg } from '../config/config';
 cron.schedule("0 0 * * *", async () => {
     const currentTime = new Date();
     currentTime.setHours(0, 0, 0, 0);
-    console.log("a");
     if (currentTime.getDay() == 0 || currentTime.getDay() == 6) return;
 
     const freeDays = free_days(currentTime.getFullYear());

@@ -34,7 +34,7 @@ async function createAdminIfNeeded(): Promise<void> {
         });
 }
 
-createAdminIfNeeded().catch((err) => console.log(err));
+createAdminIfNeeded().catch((err) => console.error(err));
 
 export async function login(username: string, password: string): Promise<string> {
     const hashedPassword = hashPassword(password);
