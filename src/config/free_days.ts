@@ -31,7 +31,8 @@ export function free_days(year: number): [number, number][] {
     corpus_christi.setFullYear(year, easter_day[1], easter_day[0]);
     corpus_christi.setDate(corpus_christi.getDate()+60);
 
-    return [
+    // free day is when it is neither a saturday nor a sunday, otherwise its a weekend-day
+    const possibleFreeDays: [number, number][] = [
         [1, 1],
         [6, 1],
         easter_day,
@@ -46,4 +47,13 @@ export function free_days(year: number): [number, number][] {
         [25, 12],
         [26, 12]
     ];
+
+    const result = [];
+    for(const possibleFreeDay of possibleFreeDays) {
+        const tmpDate = new Date(year, possibleFreeDay[1]-1, possibleFreeDay[0]);
+        if (tmpDate.getDay() !== 0 && tmpDate.getDay() !== 6) {
+            result.push(possibleFreeDay);
+        }
+    }
+    return result;
 }
