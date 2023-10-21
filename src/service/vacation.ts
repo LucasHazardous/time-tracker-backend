@@ -1,6 +1,6 @@
 import prisma from '../db/db';
 import { authorizeUser } from './user';
-import { convertNumbersToDate, count_free_days_in_month } from "../config/free_days";
+import { convertNumbersToDate, countFreeDaysInMonth } from "../config/free_days";
 
 export async function createVacation(from: Date, to: Date, category: string, token: string): Promise<number> {
     const session = await authorizeUser(token);
@@ -10,12 +10,12 @@ export async function createVacation(from: Date, to: Date, category: string, tok
     let holiday = 0;
     let count = 0;
 
-    while (from <= to) {
+    while (from < to) {
         const dayOfWeek = from.getDay();
         count += + (dayOfWeek >= 1 && dayOfWeek <= 5);
 
         if (isLastDayOfMonth(from)) {
-            const holidayDays = count_free_days_in_month(from.getFullYear(), from.getMonth() + 1, fromOriginal, to);
+            const holidayDays = countFreeDaysInMonth(from.getFullYear(), from.getMonth() + 1, fromOriginal, to);
             holiday += holidayDays;
             count -= holidayDays;
 
@@ -23,7 +23,7 @@ export async function createVacation(from: Date, to: Date, category: string, tok
                 data: {
                     userId: session!.userId,
                     from: new Date(Math.max(fromOriginal.getTime(), convertNumbersToDate(from.getFullYear(), from.getMonth() + 1, 1).getTime())),
-                    to: from,
+                    to: removeHourFromDate(from),
                     days: count,
                     category
                 }
@@ -36,16 +36,25 @@ export async function createVacation(from: Date, to: Date, category: string, tok
         from.setDate(from.getDate() + 1);
     }
 
+    const dayOfWeek = from.getDay();
+    count += + (dayOfWeek >= 1 && dayOfWeek <= 5);
+    const holidayDays = countFreeDaysInMonth(from.getFullYear(), from.getMonth() + 1, fromOriginal, to);
+    holiday += holidayDays;
+    count -= holidayDays;
+
     await prisma.vacation.create({
         data: {
             userId: session!.userId,
             from: new Date(Math.max(fromOriginal.getTime(), convertNumbersToDate(from.getFullYear(), from.getMonth() + 1, 1).getTime())),
-            to: from,
+            to: removeHourFromDate(from),
             days: count,
             category
         }
     });
+
     finalCount += count;
+
+    console.log(finalCount, holiday);
 
     return finalCount;
 }
@@ -54,4 +63,10 @@ function isLastDayOfMonth(date: Date): boolean {
     const nextDay = new Date(date);
     nextDay.setDate(date.getDate() + 1);
     return nextDay.getDate() === 1;
+}
+
+function removeHourFromDate(date: Date): Date {
+    const newDate = new Date(date);
+    newDate.setUTCHours(0, 0, 0, 0);
+    return newDate;
 }

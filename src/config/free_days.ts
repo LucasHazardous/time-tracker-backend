@@ -1,4 +1,4 @@
-function first_easter_day(year: number): [number, number] {
+function firstEasterDay(year: number): [number, number] {
     const a = year % 19;
     const b = Math.floor(year / 100);
     const c = year % 100;
@@ -17,8 +17,8 @@ function first_easter_day(year: number): [number, number] {
     return [p, q];
 }
 
-export function free_days(year: number): [number, number][] {
-    const easter_day = first_easter_day(year);
+export function holidayDays(year: number): [number, number][] {
+    const easter_day = firstEasterDay(year);
     const second_easter_day = convertNumbersToDate(year, easter_day[1], easter_day[0]);
     second_easter_day.setDate(second_easter_day.getDate() + 1);
 
@@ -48,15 +48,15 @@ export function free_days(year: number): [number, number][] {
     const result = [];
     for (const possibleFreeDay of possibleFreeDays) {
         const tmpDate = convertNumbersToDate(year, possibleFreeDay[1], possibleFreeDay[0]);
-        if (tmpDate.getDay() !== 0 && tmpDate.getDay() !== 6) {
+        if (tmpDate.getDay() >= 1 && tmpDate.getDay() <= 5) {
             result.push(possibleFreeDay);
         }
     }
     return result;
 }
 
-export function count_free_days_in_month(year: number, month: number, startDate: Date, endDate: Date): number {
-    const freeDays = free_days(year);
+export function countFreeDaysInMonth(year: number, month: number, startDate: Date, endDate: Date): number {
+    const freeDays = holidayDays(year);
     let res = 0;
     for (const day of freeDays) {
         const date = convertNumbersToDate(year, day[1], day[0]);

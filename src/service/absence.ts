@@ -1,7 +1,7 @@
 import prisma from '../db/db';
 import cron from "node-cron";
 import { authorizeUser } from './user';
-import { free_days } from '../config/free_days';
+import { holidayDays } from '../config/free_days';
 import { ErrorMsg } from '../config/config';
 
 cron.schedule("0 0 * * *", async () => {
@@ -9,7 +9,7 @@ cron.schedule("0 0 * * *", async () => {
     currentTime.setHours(0, 0, 0, 0);
     if (currentTime.getDay() == 0 || currentTime.getDay() == 6) return;
 
-    const freeDays = free_days(currentTime.getFullYear());
+    const freeDays = holidayDays(currentTime.getFullYear());
 
     for (const day of freeDays) {
         if (currentTime.getDate() === day[0] && currentTime.getMonth() + 1 == day[1]) {
