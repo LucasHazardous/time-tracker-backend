@@ -106,7 +106,7 @@ export async function createUser(username: string, password: string, admin: bool
         });
     } catch (err: any) {
         if (err.code === 'P2002') {
-            throw ErrorMsg.userExistsErrorMsg;
+            throw ErrorMsg.alreadyExistsErrorMsg;
         } else {
             console.error('Error while attempting to create user:', err);
         }

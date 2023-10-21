@@ -1,9 +1,27 @@
 import prisma from '../db/db';
 import { authorizeUser } from './user';
 import { convertNumbersToDate, countFreeDaysInMonth } from "../config/free_days";
+import { ErrorMsg } from '../config/config';
 
 export async function createVacation(from: Date, to: Date, category: string, token: string): Promise<number> {
     const session = await authorizeUser(token);
+
+    const interference = await prisma.vacation.findFirst({
+        where: {
+            from: {
+                lte: to
+            },
+            to: {
+                gte: from
+            }
+        }
+    });
+
+    if(interference) {
+        console.log("no");
+        throw ErrorMsg.alreadyExistsErrorMsg;
+    }
+
     const fromOriginal = new Date(from);
 
     let finalCount = 0;

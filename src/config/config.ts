@@ -12,7 +12,7 @@ export const session_ttl = 60 * 60 * 24 * 2;
 enum ErrorMsg {
     authorizationErrorMsg = 'Authorization failed',
     authenticationErrorMsg = 'Authentication failed',
-    userExistsErrorMsg = 'User already exists',
+    alreadyExistsErrorMsg = 'Object interferes with other',
     accessDeniedErrorMsg = 'Access denied',
     notFound = 'Target not found'
 }

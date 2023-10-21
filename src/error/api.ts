@@ -15,7 +15,7 @@ export function sendErrorStatusCode(err: ErrorMsg, res: Response) {
         case ErrorMsg.notFound:
             status = 404;
             break;
-        case ErrorMsg.userExistsErrorMsg:
+        case ErrorMsg.alreadyExistsErrorMsg:
             status = 409;
             break;
     }
