@@ -14,7 +14,8 @@ enum ErrorMsg {
     authenticationErrorMsg = 'Authentication failed',
     alreadyExistsErrorMsg = 'Object interferes with other',
     accessDeniedErrorMsg = 'Access denied',
-    notFound = 'Target not found'
+    notFound = 'Target not found',
+    unprocessableEntity = 'Unprocessable Entity'
 }
 
 export {

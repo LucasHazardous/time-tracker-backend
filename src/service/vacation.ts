@@ -4,6 +4,10 @@ import { convertNumbersToDate, countFreeDaysInMonth } from "../config/free_days"
 import { ErrorMsg } from '../config/config';
 
 export async function createVacation(from: Date, to: Date, category: string, token: string): Promise<number> {
+    if(!normalizeValidateDates(from, to)) {
+        throw ErrorMsg.unprocessableEntity;
+    }
+
     const session = await authorizeUser(token);
 
     const interference = await prisma.vacation.findFirst({
@@ -18,7 +22,6 @@ export async function createVacation(from: Date, to: Date, category: string, tok
     });
 
     if(interference) {
-        console.log("no");
         throw ErrorMsg.alreadyExistsErrorMsg;
     }
 
@@ -72,9 +75,14 @@ export async function createVacation(from: Date, to: Date, category: string, tok
 
     finalCount += count;
 
-    console.log(finalCount, holiday);
-
     return finalCount;
+}
+
+function normalizeValidateDates(from: Date, to: Date): boolean {
+    from.setUTCHours(0,0,0,0);
+    to.setUTCHours(0,0,0,0);
+
+    return from <= to;
 }
 
 function isLastDayOfMonth(date: Date): boolean {

@@ -18,6 +18,9 @@ export function sendErrorStatusCode(err: ErrorMsg, res: Response) {
         case ErrorMsg.alreadyExistsErrorMsg:
             status = 409;
             break;
+        case ErrorMsg.unprocessableEntity:
+            status = 422;
+            break;
     }
     if (status === 500) res.sendStatus(status);
     else res.status(status).send(err);
