@@ -9,6 +9,13 @@ export const maxRequestsPerTimeFrame = 100;
 
 export const sessionTTL = 60 * 60 * 24 * 2;
 
+export const allowedVacationCategories = [
+    "wypoczynkowy",
+    "rodzicielski",
+    "szkoleniowy",
+    "okolicznościowy"
+];
+
 enum ErrorMsg {
     authorizationErrorMsg = 'Authorization failed',
     authenticationErrorMsg = 'Authentication failed',

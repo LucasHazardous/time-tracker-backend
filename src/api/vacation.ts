@@ -1,0 +1,26 @@
+import express, { Request, Response } from "express";
+const vacationRouter = express.Router();
+
+import { body, header, param } from 'express-validator';
+import { sendErrorStatusCode, handleValidationError } from '../error/api';
+import { createVacation } from "../service/vacation";
+import { allowedVacationCategories } from "../config/config";
+
+vacationRouter.post(
+    '/',
+    body("from").isISO8601(),
+    body("to").isISO8601(),
+    body('category').isString().isIn(allowedVacationCategories),
+    header("Authorization").isString().contains("Bearer"),
+    (req: Request, res: Response) => {
+        if (handleValidationError(req, res)) return;
+
+        const token = req.get("Authorization")!.substring(7);
+
+        createVacation(new Date(req.body.from), new Date(req.body.to), req.body.category, token)
+            .then(() => res.sendStatus(200))
+            .catch((err) => sendErrorStatusCode(err, res));
+    }
+);
+
+export default vacationRouter;
