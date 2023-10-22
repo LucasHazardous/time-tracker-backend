@@ -7,7 +7,7 @@ export const adminPassword = "nexus-time-tracker";
 export const requestsTimeFrame = 30 * 60000;
 export const maxRequestsPerTimeFrame = 100;
 
-export const session_ttl = 60 * 60 * 24 * 2;
+export const sessionTTL = 60 * 60 * 24 * 2;
 
 enum ErrorMsg {
     authorizationErrorMsg = 'Authorization failed',

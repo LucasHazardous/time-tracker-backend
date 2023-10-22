@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { ErrorMsg, adminPassword, adminUsername, session_ttl } from '../config/config';
+import { ErrorMsg, adminPassword, adminUsername, sessionTTL } from '../config/config';
 import prisma from '../db/db';
 import cron from "node-cron";
 
@@ -51,7 +51,7 @@ export async function login(username: string, password: string): Promise<string>
         const token = generateToken(username);
 
         const expirationTime = new Date();
-        expirationTime.setSeconds(expirationTime.getSeconds() + session_ttl);
+        expirationTime.setSeconds(expirationTime.getSeconds() + sessionTTL);
 
         await prisma.session.create({
             data: {
