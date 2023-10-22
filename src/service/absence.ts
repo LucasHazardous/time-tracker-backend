@@ -4,7 +4,7 @@ import { authorizeUser } from './user';
 import { holidayDays } from '../config/free_days';
 import { ErrorMsg } from '../config/config';
 
-cron.schedule("0 0 * * *", async () => {
+cron.schedule("0 1 * * *", async () => {
     const currentTime = new Date();
     currentTime.setUTCHours(0, 0, 0, 0);
     if (currentTime.getDay() == 0 || currentTime.getDay() == 6) return;
