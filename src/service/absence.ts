@@ -19,7 +19,21 @@ cron.schedule("0 0 * * *", async () => {
 
     const users = await prisma.user.findMany({
         select: {
-            id: true
+            id: true,
+        },
+        where: {
+            NOT: {
+                vacations: {
+                    some: {
+                        from: {
+                            lte: currentTime
+                        },
+                        to: {
+                            gte: currentTime
+                        }
+                    }
+                }
+            }
         }
     });
 
