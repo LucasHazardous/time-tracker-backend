@@ -40,15 +40,17 @@ export async function createVacation(from: Date, to: Date, category: string, tok
             holiday += holidayDays;
             count -= holidayDays;
 
-            await prisma.vacation.create({
-                data: {
-                    userId: session!.userId,
-                    from: new Date(Math.max(fromOriginal.getTime(), convertNumbersToDate(from.getFullYear(), from.getMonth() + 1, 1).getTime())),
-                    to: removeHourFromDate(from),
-                    days: count,
-                    category
-                }
-            });
+            if(count > 0) {
+                await prisma.vacation.create({
+                    data: {
+                        userId: session!.userId,
+                        from: new Date(Math.max(fromOriginal.getTime(), convertNumbersToDate(from.getFullYear(), from.getMonth() + 1, 1).getTime())),
+                        to: removeHourFromDate(from),
+                        days: count,
+                        category
+                    }
+                });
+            }
 
             finalCount += count;
             count = 0;
@@ -63,20 +65,24 @@ export async function createVacation(from: Date, to: Date, category: string, tok
     holiday += holidayDays;
     count -= holidayDays;
 
-    await prisma.vacation.create({
-        data: {
-            userId: session!.userId,
-            from: new Date(Math.max(fromOriginal.getTime(), convertNumbersToDate(from.getFullYear(), from.getMonth() + 1, 1).getTime())),
-            to: removeHourFromDate(from),
-            days: count,
-            category
-        }
-    });
+    if(count > 0) {
+        await prisma.vacation.create({
+            data: {
+                userId: session!.userId,
+                from: new Date(Math.max(fromOriginal.getTime(), convertNumbersToDate(from.getFullYear(), from.getMonth() + 1, 1).getTime())),
+                to: removeHourFromDate(from),
+                days: count,
+                category
+            }
+        });
+    }
 
     finalCount += count;
 
     return finalCount;
 }
+
+createVacation(new Date("2023-10-21"), new Date("2023-10-22"), "wypoczynkowy", "caa3ccc99603759529eb98a1a99d2208952f23b8f72c1bfd04da8f0283d4ba43b25c72f8ee91594f45add7f491a587d55d2afb02671147f61e0087a34242a4f0");
 
 function normalizeValidateDates(from: Date, to: Date): boolean {
     from.setUTCHours(0,0,0,0);
