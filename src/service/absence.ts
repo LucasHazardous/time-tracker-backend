@@ -6,7 +6,7 @@ import { ErrorMsg } from '../config/config';
 
 cron.schedule("0 0 * * *", async () => {
     const currentTime = new Date();
-    currentTime.setHours(0, 0, 0, 0);
+    currentTime.setUTCHours(0, 0, 0, 0);
     if (currentTime.getDay() == 0 || currentTime.getDay() == 6) return;
 
     const freeDays = holidayDays(currentTime.getFullYear());
@@ -34,7 +34,7 @@ export async function cancelAbsence(token: string): Promise<void> {
     const session = await authorizeUser(token);
 
     const currentTime = new Date();
-    currentTime.setHours(0, 0, 0, 0);
+    currentTime.setUTCHours(0, 0, 0, 0);
     const { count } = await prisma.absence.deleteMany({
         where: {
             userId: session!.userId,
