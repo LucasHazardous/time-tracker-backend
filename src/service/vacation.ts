@@ -82,13 +82,14 @@ export async function createVacation(from: Date, to: Date, category: string, tok
     return finalCount;
 }
 
-createVacation(new Date("2023-10-21"), new Date("2023-10-22"), "wypoczynkowy", "caa3ccc99603759529eb98a1a99d2208952f23b8f72c1bfd04da8f0283d4ba43b25c72f8ee91594f45add7f491a587d55d2afb02671147f61e0087a34242a4f0");
-
 function normalizeValidateDates(from: Date, to: Date): boolean {
     from.setUTCHours(0,0,0,0);
     to.setUTCHours(0,0,0,0);
 
-    return from <= to;
+    const currentDay = new Date();
+    currentDay.setUTCHours(0,0,0,0);
+
+    return currentDay <= from && from <= to;
 }
 
 function isLastDayOfMonth(date: Date): boolean {
