@@ -11,6 +11,7 @@ import rateLimit from 'express-rate-limit';
 import userRouter from './api/user';
 import asbsenceRouter from './api/absence';
 import vacationRouter from './api/vacation';
+import sessionRouter from './api/session';
 
 const limiter = rateLimit({
     windowMs: requestsTimeFrame,
@@ -34,6 +35,7 @@ app.use(
 app.use(express.json());
 
 app.use('/api/user', userRouter);
+app.use('/api/session', sessionRouter);
 app.use('/api/absence', asbsenceRouter);
 app.use("/api/vacation", vacationRouter);
 
