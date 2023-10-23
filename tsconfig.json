@@ -1,22 +1,22 @@
 {
     "compilerOptions": {
-      "target": "ESNext", // The ECMAScript version you want to target (e.g., ES6, ES7, ESNext).
-      "module": "CommonJS", // The module system you want to use (e.g., CommonJS, ES6).
-      "outDir": "./dist", // The output directory for compiled JavaScript files.
-      "rootDir": "./src", // The root directory of your TypeScript source files.
-      "strict": true, // Enables strict type checking and more advanced checks.
-      "esModuleInterop": true, // Enables compatibility with commonJS modules and ES6 modules.
-      "forceConsistentCasingInFileNames": true, // Ensures consistent file name casing.
-      "noImplicitAny": true, // Disallow 'any' type without an explicit type annotation.
-      "removeComments": true, // Remove comments from the compiled JavaScript output.
-      "declaration": true, // Generates .d.ts declaration files.
-      "sourceMap": true, // Generate source maps for debugging.
+      "target": "ESNext",
+      "module": "CommonJS",
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "strict": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "noImplicitAny": true,
+      "removeComments": true,
+      "declaration": true,
+      "sourceMap": true,
     },
     "include": [
-      "./src/**/*.ts" // The files to include in compilation (adjust to your project structure).
+      "./src/**/*.ts",
     ],
     "exclude": [
-      "./node_modules" // Directories to exclude from compilation.
+      "./node_modules"
     ]
   }
   
