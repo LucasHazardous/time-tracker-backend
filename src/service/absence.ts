@@ -58,3 +58,19 @@ export async function cancelAbsence(token: string): Promise<void> {
 
     if(count === 0) throw ErrorMsg.notFound;
 }
+
+export async function asbsencePresent(token: string): Promise<boolean> {
+    const session = await authorizeUser(token);
+
+    const currentTime = new Date();
+    currentTime.setUTCHours(0, 0, 0, 0);
+
+    const asbsence = await prisma.absence.findFirst({
+        where: {
+            userId: session!.userId,
+            date: currentTime
+        }
+    });
+
+    return !asbsence;
+}
