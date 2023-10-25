@@ -3,7 +3,7 @@ import { ErrorMsg, sessionTTL } from '../config/config';
 import prisma from '../db/db';
 import { generateToken, hashPassword } from "../tools/encrypt";
 
-export async function login(username: string, password: string): Promise<string> {
+export async function login(username: string, password: string): Promise<{token: string, admin: boolean}> {
     const hashedPassword = hashPassword(password);
     const user = await prisma.user.findFirst({
         where: {
@@ -28,7 +28,7 @@ export async function login(username: string, password: string): Promise<string>
             }
         });
 
-        return token;
+        return {token, admin: user.admin};
     }
     throw ErrorMsg.authenticationErrorMsg;
 }

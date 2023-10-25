@@ -17,9 +17,9 @@ sessionRouter.post(
 
 
         login(req.body.username, req.body.password)
-            .then((token) =>
+            .then((data) =>
                 res.json({
-                    token: token,
+                    ...data
                 })
             )
             .catch((err) => sendErrorStatusCode(err, res));
