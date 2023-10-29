@@ -22,7 +22,10 @@ export function sendErrorStatusCode(err: ErrorMsg, res: Response) {
             status = 422;
             break;
     }
-    if (status === 500) res.sendStatus(status);
+    if (status === 500) {
+        console.error(err);
+        res.sendStatus(status);
+    }
     else res.status(status).send(err);
 }
 
