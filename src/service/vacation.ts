@@ -43,7 +43,7 @@ export async function createVacation(from: Date, to: Date, category: string, tok
             if(count > 0) {
                 await prisma.vacation.create({
                     data: {
-                        userId: session!.userId,
+                        userId: session!.id,
                         from: new Date(Math.max(fromOriginal.getTime(), convertNumbersToDate(from.getFullYear(), from.getMonth() + 1, 1).getTime())),
                         to: removeHourFromDate(from),
                         days: count,
@@ -68,7 +68,7 @@ export async function createVacation(from: Date, to: Date, category: string, tok
     if(count > 0) {
         await prisma.vacation.create({
             data: {
-                userId: session!.userId,
+                userId: session!.id,
                 from: new Date(Math.max(fromOriginal.getTime(), convertNumbersToDate(from.getFullYear(), from.getMonth() + 1, 1).getTime())),
                 to: removeHourFromDate(from),
                 days: count,

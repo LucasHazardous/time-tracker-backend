@@ -51,7 +51,7 @@ export async function cancelAbsence(token: string): Promise<void> {
     currentTime.setUTCHours(0, 0, 0, 0);
     const { count } = await prisma.absence.deleteMany({
         where: {
-            userId: session!.userId,
+            userId: session!.id,
             date: currentTime
         }
     });
@@ -67,7 +67,7 @@ export async function asbsencePresent(token: string): Promise<boolean> {
 
     const asbsence = await prisma.absence.findFirst({
         where: {
-            userId: session!.userId,
+            userId: session!.id,
             date: currentTime
         }
     });
