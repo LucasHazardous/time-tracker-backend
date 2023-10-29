@@ -1,11 +1,11 @@
+import { config } from 'dotenv';
+config();
+
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
 import { port, requestsTimeFrame, maxRequestsPerTimeFrame } from './config/config';
-
-import { config } from 'dotenv';
-config();
 
 import rateLimit from 'express-rate-limit';
 import userRouter from './api/user';
