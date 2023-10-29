@@ -1,6 +1,6 @@
 import prisma from '../db/db';
 import { authorizeUser } from './user';
-import { convertNumbersToDate, countFreeDaysInMonth } from "../config/free_days";
+import { convertNumbersToDate, countFreeDaysInMonth } from "../tools/free_days";
 import { ErrorMsg } from '../config/config';
 
 export async function createVacation(from: Date, to: Date, category: string, token: string): Promise<number> {

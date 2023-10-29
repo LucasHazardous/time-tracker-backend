@@ -1,7 +1,7 @@
 import prisma from '../db/db';
 import cron from "node-cron";
 import { authorizeUser } from './user';
-import { holidayDays } from '../config/free_days';
+import { holidayDays } from '../tools/free_days';
 import { ErrorMsg } from '../config/config';
 
 cron.schedule("0 1 * * *", async () => {
