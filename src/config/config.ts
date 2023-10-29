@@ -1,6 +1,8 @@
 export const port = 8080;
 export const minPasswordLength = 4;
 
+export const secret_token: string = process.env.SALT!;
+
 export const adminUsername = "main_admin";
 export const adminPassword = "nexus-time-tracker";
 
@@ -16,6 +18,11 @@ export const allowedVacationCategories = [
     "okolicznościowy"
 ];
 
+interface JwtTokenPayload {
+    id: string,
+    admin: boolean
+}
+
 enum ErrorMsg {
     authorizationErrorMsg = 'Authorization failed',
     authenticationErrorMsg = 'Authentication failed',
@@ -26,5 +33,6 @@ enum ErrorMsg {
 }
 
 export {
-    ErrorMsg
+    ErrorMsg,
+    JwtTokenPayload
 }
