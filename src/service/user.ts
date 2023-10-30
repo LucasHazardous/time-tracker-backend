@@ -1,7 +1,7 @@
 import { ErrorMsg, JwtTokenPayload, adminPassword, adminUsername, secret_token } from '../config/config';
 import prisma from '../db/db';
-import { hashPassword } from '../tools/encrypt';
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import { hashPassword } from '../tools/password';
 
 async function createAdminIfNeeded(): Promise<void> {
     if (
@@ -43,18 +43,16 @@ export async function createUser(username: string, password: string, admin: bool
 }
 
 export async function authorizeUser(token: string): Promise<JwtTokenPayload> {
-    const session = await prisma.session.findFirst({
-        where: {
-            token
-        }
-    });
-    if (!session) throw ErrorMsg.authorizationErrorMsg;
-    const verified: JwtPayload = jwt.decode(token) as JwtPayload;
+    try {
+        const verified: JwtTokenPayload = jwt.verify(token, secret_token) as JwtTokenPayload;
 
-    return {
-        admin: verified.admin,
-        id: verified.id
-    };
+        return {
+            admin: verified.admin,
+            id: verified.id
+        };
+    } catch(err: any) {
+        throw ErrorMsg.authorizationErrorMsg;
+    }
 }
 
 export async function authorizeAdmin(token: string): Promise<void> {

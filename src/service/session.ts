@@ -1,7 +1,8 @@
-import cron from "node-cron";
 import { ErrorMsg, sessionTTL } from '../config/config';
 import prisma from '../db/db';
-import { generateToken, hashPassword } from "../tools/encrypt";
+import jwt from "jsonwebtoken";
+import { JwtTokenPayload, secret_token } from '../config/config';
+import { hashPassword } from '../tools/password';
 
 export async function login(username: string, password: string): Promise<string> {
     const hashedPassword = hashPassword(password);
@@ -17,45 +18,15 @@ export async function login(username: string, password: string): Promise<string>
     ) {
         const token = generateToken(user.id, user.admin);
 
-        const expirationTime = new Date();
-        expirationTime.setSeconds(expirationTime.getSeconds() + sessionTTL);
-
-        await prisma.session.create({
-            data: {
-                userId: user.id,
-                token,
-                ttl: expirationTime
-            }
-        });
-
         return token;
     }
     throw ErrorMsg.authenticationErrorMsg;
 }
 
-export async function logout(token: string): Promise<void> {
-    try {
-        await prisma.session.delete({
-            where: {
-                token
-            }
-        });
-    } catch (err: any) {
-        if (err.code === 'P2025') {
-            throw ErrorMsg.notFound;
-        } else {
-            console.error('Error while attempting to delete the record:', err);
-        }
-    }
-}
-
-cron.schedule("0 * * * *", async () => {
-    const currentTime = new Date();
-    await prisma.session.deleteMany({
-        where: {
-            ttl: {
-                lte: currentTime
-            }
-        }
+function generateToken(id: string, admin: boolean): string {
+    return jwt.sign(<JwtTokenPayload>{
+        id, admin
+    }, secret_token, {
+        expiresIn: sessionTTL
     });
-});
+}
