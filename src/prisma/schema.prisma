@@ -13,16 +13,8 @@ model User {
     password String
     admin    Boolean
 
-    sessions  Session[]
     vacations Vacation[]
     absences  Absence[]
-}
-
-model Session {
-    token  String   @id
-    userId String
-    user   User     @relation(fields: [userId], references: [id])
-    ttl    DateTime
 }
 
 model Vacation {
