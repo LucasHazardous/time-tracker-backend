@@ -2,6 +2,7 @@ import { ErrorMsg, JwtTokenPayload, adminPassword, adminUsername, secret_token }
 import prisma from '../db/db';
 import jwt from "jsonwebtoken";
 import { hashPassword } from '../tools/password';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 async function createAdminIfNeeded(): Promise<void> {
     if (
@@ -34,7 +35,7 @@ export async function createUser(username: string, password: string, admin: bool
             }
         });
     } catch (err: any) {
-        if (err.code === 'P2002') {
+        if (err instanceof PrismaClientKnownRequestError && err.code === 'P2002') {
             throw ErrorMsg.alreadyExistsErrorMsg;
         } else {
             console.error('Error while attempting to create user:', err);
@@ -55,9 +56,10 @@ export async function authorizeUser(token: string): Promise<JwtTokenPayload> {
     }
 }
 
-export async function authorizeAdmin(token: string): Promise<void> {
+export async function authorizeAdmin(token: string): Promise<JwtTokenPayload> {
     const sessionData = await authorizeUser(token);
     if (!sessionData!.admin) throw ErrorMsg.accessDeniedErrorMsg;
+    return sessionData;
 }
 
 export async function getUserList(token: string): Promise<{
@@ -75,4 +77,24 @@ export async function getUserList(token: string): Promise<{
         }
     });
     return res;
+}
+
+export async function deleteUser(id: string, token: string): Promise<void> {
+    const userInfo = await authorizeAdmin(token);
+
+    if(userInfo.id === id) throw ErrorMsg.unprocessableEntity;
+
+    try {
+        await prisma.user.delete({
+            where: {
+                id
+            }
+        });
+    } catch(err: any) {
+        if(err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+            throw ErrorMsg.notFound;
+        } else {
+            console.error(err);
+        }
+    }
 }
