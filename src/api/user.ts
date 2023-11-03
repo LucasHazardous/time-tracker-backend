@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
-import { createUser, getUserList } from "../service/user";
-import { body, header } from 'express-validator';
+import { createUser, deleteUser, getUserList } from "../service/user";
+import { body, header, param } from 'express-validator';
 import { minPasswordLength } from '../config/config';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
 
@@ -20,6 +20,19 @@ userRouter.post(
     const token = req.get("Authorization")!.substring(7);
 
     createUser(req.body.username, req.body.password, req.body.admin, token)
+      .then(() => res.sendStatus(200))
+      .catch((err) => sendErrorStatusCode(err, res));
+  }
+);
+
+userRouter.delete('/:id', header("Authorization").isString().contains("Bearer"),
+  param("id").isString().isUUID(),
+  (req: Request, res: Response) => {
+    if (handleValidationError(req, res)) return;
+
+    const token = req.get("Authorization")!.substring(7);
+
+    deleteUser(req.params.id, token)
       .then(() => res.sendStatus(200))
       .catch((err) => sendErrorStatusCode(err, res));
   }
