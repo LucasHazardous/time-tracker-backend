@@ -9,4 +9,5 @@ RUN npm install
 
 CMD npm run pgenerate && \
     npm run pmigrate && \
+    npm run compile && \
     npm run run
