@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { createUser, deleteUser, getUserList } from "../service/user";
+import { createUser, deleteUser, getUserList, getUserStats } from "../service/user";
 import { body, header, param } from 'express-validator';
 import { minPasswordLength } from '../config/config';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
@@ -44,6 +44,16 @@ userRouter.get('/', header("Authorization").isString().contains("Bearer"), (req:
   const token = req.get("Authorization")!.substring(7);
 
   getUserList(token)
+    .then((result) => res.json(result))
+    .catch((err) => sendErrorStatusCode(err, res));
+});
+
+userRouter.get('/:year/:month', header("Authorization").isString().contains("Bearer"), param("year").isInt({min: 2000, max:3000}), param("month").isInt({min: 1, max:12}), (req: Request, res: Response) => {
+  if (handleValidationError(req, res)) return;
+
+  const token = req.get("Authorization")!.substring(7);
+
+  getUserStats(req.params.year, req.params.month, token)
     .then((result) => res.json(result))
     .catch((err) => sendErrorStatusCode(err, res));
 });
