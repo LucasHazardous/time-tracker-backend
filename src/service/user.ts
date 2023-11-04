@@ -98,3 +98,20 @@ export async function deleteUser(id: string, token: string): Promise<void> {
         }
     }
 }
+
+export async function getUserStats(year: string, month: string, token: string): Promise<{}> {
+    const userInfo = await authorizeUser(token);
+
+    const data = await Promise.all([
+        new Promise((resolve, _) => {
+            resolve(prisma.$queryRaw`SELECT date FROM absence WHERE userId=${userInfo.id} AND YEAR(date)=${year} AND MONTH(date)=${month};`);
+        }),
+        new Promise((resolve, _) => {
+            resolve(prisma.$queryRaw`SELECT \`from\`, \`to\`, \`days\` FROM vacation WHERE userId=${userInfo.id} AND YEAR(\`from\`)=${year} AND MONTH(\`from\`)=${month};`);
+        })
+    ]);
+
+    return {
+        data: data.flat()
+    };
+}
