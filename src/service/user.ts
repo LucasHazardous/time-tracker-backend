@@ -21,7 +21,7 @@ async function createAdminIfNeeded(): Promise<void> {
         });
 }
 
-createAdminIfNeeded().catch((err) => console.error(err));
+createAdminIfNeeded();
 
 export async function createUser(username: string, password: string, admin: boolean, token: string): Promise<void> {
     await authorizeAdmin(token);
@@ -37,9 +37,8 @@ export async function createUser(username: string, password: string, admin: bool
     } catch (err: any) {
         if (err instanceof PrismaClientKnownRequestError && err.code === 'P2002') {
             throw ErrorMsg.alreadyExistsErrorMsg;
-        } else {
-            console.error('Error while attempting to create user:', err);
         }
+        throw err;
     }
 }
 
@@ -93,9 +92,37 @@ export async function deleteUser(id: string, token: string): Promise<void> {
     } catch(err: any) {
         if(err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
             throw ErrorMsg.notFound;
-        } else {
-            console.error(err);
         }
+        throw err;
+    }
+}
+
+export async function editUser(id: string, username: string | undefined, password: string | undefined, admin: boolean | undefined, token: string): Promise<void> {
+    const adminData = await authorizeAdmin(token);
+
+    if(password) password = hashPassword(password);
+    if(admin === false && (id === adminData.id || username === adminUsername)) throw ErrorMsg.unprocessableEntity;
+
+    try {
+        await prisma.user.update({
+            where: {
+                id
+            },
+            data: {
+                username,
+                password,
+                admin
+            }
+        });
+    } catch (err) {
+        if(err instanceof PrismaClientKnownRequestError) {
+            if(err.code === 'P2002') {
+                throw ErrorMsg.alreadyExistsErrorMsg;
+            } else if(err.code === 'P2025') {
+                throw ErrorMsg.notFound;
+            }
+        }
+        throw err;
     }
 }
 
@@ -103,12 +130,10 @@ export async function getUserStats(year: string, month: string, token: string): 
     const userInfo = await authorizeUser(token);
 
     const data = await Promise.all([
-        new Promise((resolve, _) => {
-            resolve(prisma.$queryRaw`SELECT date FROM absence WHERE userId=${userInfo.id} AND YEAR(date)=${year} AND MONTH(date)=${month};`);
-        }),
-        new Promise((resolve, _) => {
-            resolve(prisma.$queryRaw`SELECT \`from\`, \`to\`, \`days\` FROM vacation WHERE userId=${userInfo.id} AND YEAR(\`from\`)=${year} AND MONTH(\`from\`)=${month};`);
-        })
+        new Promise((resolve, _) => 
+            resolve(prisma.$queryRaw`SELECT date FROM absence WHERE userId=${userInfo.id} AND YEAR(date)=${year} AND MONTH(date)=${month};`)),
+        new Promise((resolve, _) => 
+            resolve(prisma.$queryRaw`SELECT \`from\`, \`to\`, \`days\` FROM vacation WHERE userId=${userInfo.id} AND YEAR(\`from\`)=${year} AND MONTH(\`from\`)=${month};`))
     ]);
 
     return {
