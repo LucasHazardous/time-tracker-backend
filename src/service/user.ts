@@ -50,7 +50,7 @@ export async function authorizeUser(token: string): Promise<JwtTokenPayload> {
             admin: verified.admin,
             id: verified.id
         };
-    } catch(err: any) {
+    } catch (err: any) {
         throw ErrorMsg.authorizationErrorMsg;
     }
 }
@@ -81,7 +81,7 @@ export async function getUserList(token: string): Promise<{
 export async function deleteUser(id: string, token: string): Promise<void> {
     const userInfo = await authorizeAdmin(token);
 
-    if(userInfo.id === id) throw ErrorMsg.unprocessableEntity;
+    if (userInfo.id === id) throw ErrorMsg.unprocessableEntity;
 
     try {
         await prisma.user.delete({
@@ -89,8 +89,8 @@ export async function deleteUser(id: string, token: string): Promise<void> {
                 id
             }
         });
-    } catch(err: any) {
-        if(err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+    } catch (err: any) {
+        if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
             throw ErrorMsg.notFound;
         }
         throw err;
@@ -100,8 +100,8 @@ export async function deleteUser(id: string, token: string): Promise<void> {
 export async function editUser(id: string, username: string | undefined, password: string | undefined, admin: boolean | undefined, token: string): Promise<void> {
     const adminData = await authorizeAdmin(token);
 
-    if(password) password = hashPassword(password);
-    if(admin === false && (id === adminData.id || username === adminUsername)) throw ErrorMsg.unprocessableEntity;
+    if (password) password = hashPassword(password);
+    if (admin === false && (id === adminData.id || username === adminUsername)) throw ErrorMsg.unprocessableEntity;
 
     try {
         await prisma.user.update({
@@ -115,10 +115,10 @@ export async function editUser(id: string, username: string | undefined, passwor
             }
         });
     } catch (err) {
-        if(err instanceof PrismaClientKnownRequestError) {
-            if(err.code === 'P2002') {
+        if (err instanceof PrismaClientKnownRequestError) {
+            if (err.code === 'P2002') {
                 throw ErrorMsg.alreadyExistsErrorMsg;
-            } else if(err.code === 'P2025') {
+            } else if (err.code === 'P2025') {
                 throw ErrorMsg.notFound;
             }
         }
@@ -140,10 +140,107 @@ export async function getSelectedUserStats(id: string, year: string, month: stri
 
 async function getUserStats(id: string, year: string, month: string): Promise<{}> {
     const data = await Promise.all([
-        new Promise((resolve, _) => 
+        new Promise((resolve, _) =>
             resolve(prisma.$queryRaw`SELECT date FROM absence WHERE userId=${id} AND YEAR(date)=${year} AND MONTH(date)=${month};`)),
-        new Promise((resolve, _) => 
+        new Promise((resolve, _) =>
             resolve(prisma.$queryRaw`SELECT \`from\`, \`to\`, \`days\` FROM vacation WHERE userId=${id} AND YEAR(\`from\`)=${year} AND MONTH(\`from\`)=${month};`))
+    ]);
+
+    return {
+        data: data.flat()
+    };
+}
+
+export async function todayState(token: string): Promise<{}> {
+    await authorizeAdmin(token);
+
+    const currentDay = new Date();
+    currentDay.setUTCHours(0, 0, 0, 0);
+
+    const data = await Promise.all([
+        new Promise(async (resolve, _) => {
+            const users = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    username: true
+                }, where: {
+                    absences: {
+                        some: {
+                            date: currentDay
+                        }
+                    }
+                }
+            });
+
+            resolve(users.map(res => ({
+                ...res,
+                status: 'nieobecny'
+            })));
+        }),
+        new Promise(async (resolve, _) => {
+            const users = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    username: true
+                },
+                where: {
+                    vacations: {
+                        some: {
+                            from: {
+                                lte: currentDay
+                            },
+                            to: {
+                                gte: currentDay
+                            }
+                        }
+                    }
+                }
+            });
+
+            resolve(users.map(res => ({
+                ...res,
+                status: 'wakacje'
+            })));
+        }),
+        new Promise(async (resolve, _) => {
+            const users = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    username: true
+                },
+                where: {
+                    NOT: {
+                        OR: [
+                            {
+                                vacations: {
+                                    some: {
+                                        from: {
+                                            lte: currentDay
+                                        },
+                                        to: {
+                                            gte: currentDay
+                                        }
+                                    }
+                                },
+
+                            },
+                            {
+                                absences: {
+                                    some: {
+                                        date: currentDay
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            });
+
+            resolve(users.map(res => ({
+                ...res,
+                status: 'obecny'
+            })));
+        })
     ]);
 
     return {
