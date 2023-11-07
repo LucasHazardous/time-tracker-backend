@@ -1,6 +1,6 @@
 import prisma from '../db/db';
 import cron from "node-cron";
-import { authorizeUser } from './user';
+import { authorizeAdmin, authorizeUser } from './user';
 import { holidayDays } from '../tools/free_days';
 import { ErrorMsg } from '../config/config';
 
@@ -73,4 +73,17 @@ export async function asbsencePresent(token: string): Promise<boolean> {
     });
 
     return !asbsence;
+}
+
+export async function deleteAbsence(userId: string, date: Date, token: string): Promise<void> {
+    await authorizeAdmin(token);
+
+    const { count } = await prisma.absence.deleteMany({
+        where: {
+            userId,
+            date
+        }
+    });
+
+    if(count === 0) throw ErrorMsg.notFound;
 }
