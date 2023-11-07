@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { createUser, deleteUser, editUser, getUserList, getUserStats } from "../service/user";
+import { createUser, deleteUser, editUser, getCurrentUserStats, getSelectedUserStats, getUserList } from "../service/user";
 import { body, header, param } from 'express-validator';
 import { minPasswordLength } from '../config/config';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
@@ -52,7 +52,7 @@ userRouter.put('/:id',
   header("Authorization").isString().contains("Bearer"),
   param("id").isString().isUUID(),
   body("username").isString().optional(),
-  body("password").isString().isLength({min: minPasswordLength}).optional(),
+  body("password").isString().isLength({ min: minPasswordLength }).optional(),
   body("admin").isBoolean().optional(),
   (req: Request, res: Response) => {
     if (handleValidationError(req, res)) return;
@@ -65,14 +65,35 @@ userRouter.put('/:id',
   }
 );
 
-userRouter.get('/:year/:month', header("Authorization").isString().contains("Bearer"), param("year").isInt({ min: 2000, max: 3000 }), param("month").isInt({ min: 1, max: 12 }), (req: Request, res: Response) => {
-  if (handleValidationError(req, res)) return;
+userRouter.get('/:year/:month',
+  header("Authorization").isString().contains("Bearer"),
+  param("year").isInt({ min: 2000, max: 3000 }),
+  param("month").isInt({ min: 1, max: 12 }),
+  (req: Request, res: Response) => {
+    if (handleValidationError(req, res)) return;
 
-  const token = req.get("Authorization")!.substring(7);
+    const token = req.get("Authorization")!.substring(7);
 
-  getUserStats(req.params.year, req.params.month, token)
-    .then((result) => res.json(result))
-    .catch((err) => sendErrorStatusCode(err, res));
-});
+    getCurrentUserStats(req.params.year, req.params.month, token)
+      .then((result) => res.json(result))
+      .catch((err) => sendErrorStatusCode(err, res));
+  }
+);
+
+userRouter.get('/:id/:year/:month',
+  header("Authorization").isString().contains("Bearer"),
+  param("id").isString().isUUID(),
+  param("year").isInt({ min: 2000, max: 3000 }),
+  param("month").isInt({ min: 1, max: 12 }),
+  (req: Request, res: Response) => {
+    if (handleValidationError(req, res)) return;
+
+    const token = req.get("Authorization")!.substring(7);
+
+    getSelectedUserStats(req.params.id, req.params.year, req.params.month, token)
+      .then((result) => res.json(result))
+      .catch((err) => sendErrorStatusCode(err, res));
+  }
+);
 
 export default userRouter;
