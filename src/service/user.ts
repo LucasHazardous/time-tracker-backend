@@ -126,14 +126,24 @@ export async function editUser(id: string, username: string | undefined, passwor
     }
 }
 
-export async function getUserStats(year: string, month: string, token: string): Promise<{}> {
+export async function getCurrentUserStats(year: string, month: string, token: string): Promise<{}> {
     const userInfo = await authorizeUser(token);
 
+    return await getUserStats(userInfo.id, year, month);
+}
+
+export async function getSelectedUserStats(id: string, year: string, month: string, token: string): Promise<{}> {
+    await authorizeAdmin(token);
+
+    return await getUserStats(id, year, month);
+}
+
+async function getUserStats(id: string, year: string, month: string): Promise<{}> {
     const data = await Promise.all([
         new Promise((resolve, _) => 
-            resolve(prisma.$queryRaw`SELECT date FROM absence WHERE userId=${userInfo.id} AND YEAR(date)=${year} AND MONTH(date)=${month};`)),
+            resolve(prisma.$queryRaw`SELECT date FROM absence WHERE userId=${id} AND YEAR(date)=${year} AND MONTH(date)=${month};`)),
         new Promise((resolve, _) => 
-            resolve(prisma.$queryRaw`SELECT \`from\`, \`to\`, \`days\` FROM vacation WHERE userId=${userInfo.id} AND YEAR(\`from\`)=${year} AND MONTH(\`from\`)=${month};`))
+            resolve(prisma.$queryRaw`SELECT \`from\`, \`to\`, \`days\` FROM vacation WHERE userId=${id} AND YEAR(\`from\`)=${year} AND MONTH(\`from\`)=${month};`))
     ]);
 
     return {
