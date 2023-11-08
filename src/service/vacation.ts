@@ -1,7 +1,25 @@
 import prisma from '../db/db';
-import { authorizeUser } from './user';
+import { authorizeAdmin, authorizeUser } from './user';
 import { convertNumbersToDate, countFreeDaysInMonth } from "../tools/free_days";
 import { ErrorMsg } from '../config/config';
+
+export async function deleteVacation(date: Date, userId: string, token: string): Promise<void> {
+    await authorizeAdmin(token);
+
+    const { count } = await prisma.vacation.deleteMany({
+        where: {
+            from: {
+                lte: date
+            },
+            to: {
+                gte: date
+            },
+            userId
+        }
+    });
+
+    if(count === 0) throw ErrorMsg.notFound;
+}
 
 export async function createVacation(from: Date, to: Date, category: string, token: string): Promise<number> {
     if(!normalizeValidateDates(from, to)) {
