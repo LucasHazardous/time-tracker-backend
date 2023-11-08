@@ -3,7 +3,7 @@ const vacationRouter = express.Router();
 
 import { body, header, param } from 'express-validator';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
-import { createVacation } from "../service/vacation";
+import { createVacation, deleteVacation } from "../service/vacation";
 import { allowedVacationCategories } from "../config/config";
 
 vacationRouter.post(
@@ -18,6 +18,22 @@ vacationRouter.post(
         const token = req.get("Authorization")!.substring(7);
 
         createVacation(new Date(req.body.from), new Date(req.body.to), req.body.category, token)
+            .then(() => res.sendStatus(200))
+            .catch((err) => sendErrorStatusCode(err, res));
+    }
+);
+
+vacationRouter.delete(
+    '/',
+    body("date").isISO8601(),
+    body("userId").isString().isUUID(),
+    header("Authorization").isString().contains("Bearer"),
+    (req: Request, res: Response) => {
+        if (handleValidationError(req, res)) return;
+
+        const token = req.get("Authorization")!.substring(7);
+
+        deleteVacation(req.body.date, req.body.userId, token)
             .then(() => res.sendStatus(200))
             .catch((err) => sendErrorStatusCode(err, res));
     }
