@@ -1,4 +1,4 @@
-import { ErrorMsg, JwtTokenPayload, adminPassword, adminUsername, secret_token } from '../config/config';
+import { ErrorMsg, JwtTokenPayload, adminPassword, adminUsername, prismaAlreadyExistsError, prismaNotFoundError, secret_token } from '../config/config';
 import prisma from '../db/db';
 import jwt from "jsonwebtoken";
 import { hashPassword } from '../tools/password';
@@ -35,7 +35,7 @@ export async function createUser(username: string, password: string, admin: bool
             }
         });
     } catch (err: any) {
-        if (err instanceof PrismaClientKnownRequestError && err.code === 'P2002') {
+        if (err instanceof PrismaClientKnownRequestError && err.code === prismaAlreadyExistsError) {
             throw ErrorMsg.alreadyExistsErrorMsg;
         }
         throw err;
@@ -90,7 +90,7 @@ export async function deleteUser(id: string, token: string): Promise<void> {
             }
         });
     } catch (err: any) {
-        if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+        if (err instanceof PrismaClientKnownRequestError && err.code === prismaNotFoundError) {
             throw ErrorMsg.notFound;
         }
         throw err;
@@ -116,9 +116,9 @@ export async function editUser(id: string, username: string | undefined, passwor
         });
     } catch (err) {
         if (err instanceof PrismaClientKnownRequestError) {
-            if (err.code === 'P2002') {
+            if (err.code === prismaAlreadyExistsError) {
                 throw ErrorMsg.alreadyExistsErrorMsg;
-            } else if (err.code === 'P2025') {
+            } else if (err.code === prismaNotFoundError) {
                 throw ErrorMsg.notFound;
             }
         }
