@@ -12,6 +12,7 @@ import userRouter from './api/user';
 import asbsenceRouter from './api/absence';
 import vacationRouter from './api/vacation';
 import sessionRouter from './api/session';
+import analyticsRouter from './api/analytics';
 
 const limiter = rateLimit({
     windowMs: requestsTimeFrame,
@@ -38,6 +39,7 @@ app.use('/api/user', userRouter);
 app.use('/api/session', sessionRouter);
 app.use('/api/absence', asbsenceRouter);
 app.use("/api/vacation", vacationRouter);
+app.use("/api/analytics", analyticsRouter);
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
