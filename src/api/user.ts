@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { createUser, deleteUser, editUser, getCurrentUserStats, getSelectedUserStats, getUserList, todayState } from "../service/user";
+import { createUser, deleteUser, editUser, getCurrentUserStats, getSelectedUserStats, getUserList } from "../service/user";
 import { body, header, param } from 'express-validator';
 import { minPasswordLength } from '../config/config';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
@@ -91,19 +91,6 @@ userRouter.get('/:id/:year/:month',
     const token = req.get("Authorization")!.substring(7);
 
     getSelectedUserStats(req.params.id, req.params.year, req.params.month, token)
-      .then((result) => res.json(result))
-      .catch((err) => sendErrorStatusCode(err, res));
-  }
-);
-
-userRouter.get('/today-state',
-  header("Authorization").isString().contains("Bearer"),
-  (req: Request, res: Response) => {
-    if (handleValidationError(req, res)) return;
-
-    const token = req.get("Authorization")!.substring(7);
-
-    todayState(token)
       .then((result) => res.json(result))
       .catch((err) => sendErrorStatusCode(err, res));
   }
