@@ -5,6 +5,18 @@ import { getCsv, todayState } from "../service/analytics";
 
 const analyticsRouter = express.Router();
 
+/**
+ * @api {get} /analytics/today-state Get information about each user's state today
+ * @apiGroup Analytics
+ * @apiPermission Admin
+ * 
+ * @apiHeader {String} authorization Authorization
+ * 
+ * @apiSuccess {Object[]} data List of users with states
+ * @apiSuccess {String} data.id
+ * @apiSuccess {String} data.username
+ * @apiSuccess {String} data.status
+ */
 analyticsRouter.get('/today-state',
   header("Authorization").isString().contains("Bearer"),
   (req: Request, res: Response) => {
@@ -18,6 +30,16 @@ analyticsRouter.get('/today-state',
   }
 );
 
+/**
+ * @api {get} /analytics/csv/:year/:month CSV file download for a given month
+ * @apiGroup Analytics
+ * @apiPermission Admin
+ *
+ * @apiParam {Number} year
+ * @apiParam {Number} month
+ * @apiHeader {String} authorization Authorization
+ * 
+ */
 analyticsRouter.get('/csv/:year/:month',
   header("Authorization").isString().contains("Bearer"),
   param("year").isInt({ min: 2000, max: 3000 }),
