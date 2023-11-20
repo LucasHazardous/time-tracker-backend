@@ -37,3 +37,9 @@ Run:
 ```
 npm run run
 ```
+
+Documentation:
+
+```
+npm run docs
+```

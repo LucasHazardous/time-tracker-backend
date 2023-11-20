@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "gp": "prisma generate && prisma db push",
     "compile": "tsc",
-    "run": "node dist/app.js"
+    "run": "node dist/app.js",
+    "docs": "npx apidoc -i src/api/ -o docs/"
   },
   "keywords": [],
   "author": "",
