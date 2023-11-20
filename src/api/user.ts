@@ -6,6 +6,16 @@ import { sendErrorStatusCode, handleValidationError } from '../error/api';
 
 const userRouter = express.Router();
 
+/**
+ * @api {post} /user/ Create a user
+ * @apiGroup User
+ * @apiPermission Admin
+ * 
+ * @apiHeader {String} authorization Authorization
+ * @apiBody {String} username
+ * @apiBody {String} password
+ * @apiBody {Boolean} admin 
+ */
 userRouter.post(
   '/',
   body('username').isString(),
@@ -25,6 +35,15 @@ userRouter.post(
   }
 );
 
+/**
+ * @api {delete} /user/:id Delete user
+ * @apiGroup User
+ * @apiPermission Admin
+ * 
+ * @apiHeader {String} authorization Authorization
+ * 
+ * @apiParam {String} id Target user id
+ */
 userRouter.delete('/:id', header("Authorization").isString().contains("Bearer"),
   param("id").isString().isUUID(),
   (req: Request, res: Response) => {
@@ -38,6 +57,17 @@ userRouter.delete('/:id', header("Authorization").isString().contains("Bearer"),
   }
 );
 
+/**
+ * @api {get} /user/ User list
+ * @apiGroup User
+ * @apiPermission Admin
+ * 
+ * @apiHeader {String} authorization Authorization
+ * @apiSuccess {Object[]} data User list
+ * @apiSuccess {String} data.id
+ * @apiSuccess {String} data.username
+ * @apiSuccess {Boolean} data.admin
+ */
 userRouter.get('/', header("Authorization").isString().contains("Bearer"), (req: Request, res: Response) => {
   if (handleValidationError(req, res)) return;
 
@@ -48,6 +78,19 @@ userRouter.get('/', header("Authorization").isString().contains("Bearer"), (req:
     .catch((err) => sendErrorStatusCode(err, res));
 });
 
+
+/**
+ * @api {put} /user/:id Update user
+ * @apiGroup User
+ * @apiPermission Admin
+ * 
+ * @apiHeader {String} authorization Authorization
+ * @apiParam {String} id
+ * 
+ * @apiBody {String} [username]
+ * @apiBody {String} [password]
+ * @apiBody {Boolean} [admin]
+ */
 userRouter.put('/:id',
   header("Authorization").isString().contains("Bearer"),
   param("id").isString().isUUID(),
@@ -65,6 +108,22 @@ userRouter.put('/:id',
   }
 );
 
+/**
+ * @api {put} /user/:year/:month Current user stats
+ * @apiGroup User
+ * @apiPermission User
+ * @apiDescription Returns a list with elements that are either a single day of absence or vacation range with vacation days used
+ * 
+ * @apiHeader {String} authorization Authorization
+ * @apiParam {Number} year
+ * @apiParam {Number} month
+ * 
+ * @apiSuccess {Object[]} data
+ * @apiSuccess {Date} [data.date] **Absence** Single day of absence
+ * @apiSuccess {Date} [data.from] **Vacation** Beginning of vacation range
+ * @apiSuccess {Date} [data.to] **Vacation** End of vacation range
+ * @apiSuccess {Number} [data.days] **Vacation** Number of vacation days used in vacation range
+ */
 userRouter.get('/:year/:month',
   header("Authorization").isString().contains("Bearer"),
   param("year").isInt({ min: 2000, max: 3000 }),
@@ -80,6 +139,24 @@ userRouter.get('/:year/:month',
   }
 );
 
+
+/**
+ * @api {put} /user/:id/:year/:month Target user stats
+ * @apiGroup User
+ * @apiPermission Admin
+ * @apiDescription Returns a list with elements that are either a single day of absence or vacation range with vacation days used
+ * 
+ * @apiHeader {String} authorization Authorization
+ * @apiParam {Number} year
+ * @apiParam {Number} month
+ * @apiParam {String} id User id
+ * 
+ * @apiSuccess {Object[]} data
+ * @apiSuccess {Date} [data.date] **Absence** Single day of absence
+ * @apiSuccess {Date} [data.from] **Vacation** Beginning of vacation range
+ * @apiSuccess {Date} [data.to] **Vacation** End of vacation range
+ * @apiSuccess {Number} [data.days] **Vacation** Number of vacation days used in vacation range
+ */
 userRouter.get('/:id/:year/:month',
   header("Authorization").isString().contains("Bearer"),
   param("id").isString().isUUID(),
