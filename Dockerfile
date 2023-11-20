@@ -7,7 +7,6 @@ COPY tsconfig.json .env package.json package-lock.json /app/
 
 RUN npm install
 
-CMD npm run pgenerate && \
-    npm run pmigrate && \
+CMD npm run gp && \
     npm run compile && \
     npm run run

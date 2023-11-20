@@ -20,16 +20,10 @@ Install dependencies:
 npm i
 ```
 
-Generate prisma schema:
+Generate and migrate prisma schema:
 
 ```
-npm run pgenerate
-```
-
-Migrate prisma schema:
-
-```
-npm run pmigrate
+npm run gp
 ```
 
 Compile TS files:

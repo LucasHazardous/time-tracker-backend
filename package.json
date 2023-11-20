@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pgenerate": "prisma generate",
-    "pmigrate": "prisma db push",
+    "gp": "prisma generate && prisma db push",
     "compile": "tsc",
     "run": "node dist/app.js"
   },
