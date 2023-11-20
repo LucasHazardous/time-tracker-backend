@@ -61,21 +61,23 @@ export async function authorizeAdmin(token: string): Promise<JwtTokenPayload> {
     return sessionData;
 }
 
-export async function getUserList(token: string): Promise<{
+export async function getUserList(token: string): Promise<{data: {
     id: string,
     username: string,
     admin: boolean
-}[]> {
+}[]}> {
     await authorizeAdmin(token);
 
-    const res = await prisma.user.findMany({
+    const data = await prisma.user.findMany({
         select: {
             id: true,
             username: true,
             admin: true
         }
     });
-    return res;
+    return {
+        data
+    };
 }
 
 export async function deleteUser(id: string, token: string): Promise<void> {
