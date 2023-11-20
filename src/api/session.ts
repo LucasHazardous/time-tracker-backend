@@ -6,6 +6,16 @@ import { sendErrorStatusCode, handleValidationError } from '../error/api';
 
 const sessionRouter = express.Router();
 
+/**
+ * @api {post} /session/ Login
+ * @apiGroup Session
+ * @apiPermission None
+ * 
+ * @apiBody {String} username
+ * @apiBody {String} password
+ * 
+ * @apiSuccess {String} token JWT token with encoded: user **id** and **admin** boolean.
+ */
 sessionRouter.post(
     '/login',
     body('username').isString(),
