@@ -6,6 +6,17 @@ import { sendErrorStatusCode, handleValidationError } from '../error/api';
 import { createVacation, deleteVacation } from "../service/vacation";
 import { allowedVacationCategories } from "../config/config";
 
+/**
+ * @api {post} /vacation/ Add a vacation
+ * @apiGroup Vacation
+ * @apiPermission User
+ * 
+ * @apiHeader {String} authorization Authorization
+ * @apiBody {Date} from
+ * @apiBody {Date} to
+ * @apiBody {String} category Vacation category from available categories
+ * 
+ */
 vacationRouter.post(
     '/',
     body("from").isISO8601(),
@@ -23,6 +34,17 @@ vacationRouter.post(
     }
 );
 
+
+/**
+ * @api {delete} /vacation/ Delete vacation for target user interfering with a given day
+ * @apiGroup Vacation
+ * @apiPermission Admin
+ * 
+ * @apiHeader {String} authorization Authorization
+ * @apiBody {Date} date
+ * @apiBody {String} userId User id
+ * 
+ */
 vacationRouter.delete(
     '/',
     body("date").isISO8601(),
