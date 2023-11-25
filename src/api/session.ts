@@ -7,7 +7,7 @@ import { sendErrorStatusCode, handleValidationError } from '../error/api';
 const sessionRouter = express.Router();
 
 /**
- * @api {post} /session/ Login
+ * @api {post} /session/login Login
  * @apiGroup Session
  * @apiPermission None
  * 
