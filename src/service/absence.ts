@@ -72,7 +72,7 @@ export async function asbsencePresent(token: string): Promise<boolean> {
         }
     });
 
-    return !asbsence;
+    return !!asbsence;
 }
 
 export async function deleteAbsence(userId: string, date: Date, token: string): Promise<void> {

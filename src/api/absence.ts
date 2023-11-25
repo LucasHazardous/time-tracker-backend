@@ -12,7 +12,7 @@ import { cancelAbsence, asbsencePresent, deleteAbsence } from "../service/absenc
  * 
  * @apiHeader {String} authorization Authorization
  * 
- * @apiSuccess {Boolean} absence Boolean indicating whether a user deleted current absence.
+ * @apiSuccess {Boolean} absence True if there exists an absence for today.
  */
 asbsenceRouter.get('/', header("Authorization").isString().contains("Bearer"), (req: Request, res: Response) => {
   if (handleValidationError(req, res)) return;
