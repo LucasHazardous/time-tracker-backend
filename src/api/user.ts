@@ -141,7 +141,7 @@ userRouter.get('/:year/:month',
 
 
 /**
- * @api {put} /user/:id/:year/:month Target user stats
+ * @api {get} /user/:id/:year/:month Target user stats
  * @apiGroup User
  * @apiPermission Admin
  * @apiDescription Returns a list with elements that are either a single day of absence or vacation range with vacation days used
