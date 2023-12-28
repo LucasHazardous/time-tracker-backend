@@ -35,7 +35,8 @@ export async function createVacation(from: Date, to: Date, category: string, tok
             },
             to: {
                 gte: from
-            }
+            },
+            userId: session.id
         }
     });
 
