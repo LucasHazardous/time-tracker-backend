@@ -143,9 +143,9 @@ export async function getSelectedUserStats(id: string, year: string, month: stri
 async function getUserStats(id: string, year: string, month: string): Promise<{}> {
     const data = await Promise.all([
         new Promise((resolve, _) =>
-            resolve(prisma.$queryRaw`SELECT date FROM absence WHERE userId=${id} AND YEAR(date)=${year} AND MONTH(date)=${month};`)),
+            resolve(prisma.$queryRaw`SELECT date FROM Absence WHERE userId=${id} AND YEAR(date)=${year} AND MONTH(date)=${month};`)),
         new Promise((resolve, _) =>
-            resolve(prisma.$queryRaw`SELECT \`from\`, \`to\`, \`days\` FROM vacation WHERE userId=${id} AND YEAR(\`from\`)=${year} AND MONTH(\`from\`)=${month};`))
+            resolve(prisma.$queryRaw`SELECT \`from\`, \`to\`, \`days\` FROM Vacation WHERE userId=${id} AND YEAR(\`from\`)=${year} AND MONTH(\`from\`)=${month};`))
     ]);
 
     return {

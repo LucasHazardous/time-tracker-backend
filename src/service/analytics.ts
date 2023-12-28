@@ -107,11 +107,11 @@ export async function getCsv(year: string, month: string, token: string): Promis
         absences: number,
         vacations: number
     }[] = await prisma.$queryRaw`
-    SELECT user.username AS username, COUNT(absence.id) AS absences, CONVERT(COALESCE(SUM(vacation.days), 0), INT) AS vacations 
-    FROM user 
-    LEFT JOIN absence ON user.id=absence.userId AND (YEAR(absence.date)=${year} AND MONTH(absence.date)=${month}) 
-    LEFT JOIN vacation ON user.id=vacation.userId AND (YEAR(vacation.from)=${year} AND MONTH(vacation.from)=${month}) 
-    GROUP BY user.id;`;
+    SELECT User.username AS username, COUNT(Absence.id) AS absences, CONVERT(COALESCE(SUM(Vacation.days), 0), INT) AS vacations
+    FROM User
+    LEFT JOIN Absence ON User.id=Absence.userId AND (YEAR(Absence.date)=${year} AND MONTH(Absence.date)=${month})
+    LEFT JOIN Vacation ON User.id=Vacation.userId AND (YEAR(Vacation.from)=${year} AND MONTH(Vacation.from)=${month})
+    GROUP BY User.id;`;
 
     return json2csv(data);
 }
