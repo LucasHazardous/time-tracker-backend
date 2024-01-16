@@ -33,7 +33,8 @@ cron.schedule("0 1 * * *", async () => {
                         }
                     }
                 }
-            }
+            },
+            admin: false
         }
     });
 
