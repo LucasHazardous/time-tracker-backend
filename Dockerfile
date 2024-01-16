@@ -9,4 +9,4 @@ RUN npm install
 
 CMD npm run gp && \
     npm run compile && \
-    npm run run
+    npm run start

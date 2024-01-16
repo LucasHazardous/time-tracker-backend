@@ -35,7 +35,7 @@ npm run compile
 Run:
 
 ```
-npm run run
+npm run start
 ```
 
 Documentation:
