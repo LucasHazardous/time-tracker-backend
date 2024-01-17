@@ -19,7 +19,7 @@ export async function createPresence(type: string, token: string): Promise<void>
         }
     }
 
-    const vacation = await prisma.vacation.findMany({
+    const vacation = await prisma.vacation.findFirst({
         select: {
             id: true
         },
@@ -34,16 +34,14 @@ export async function createPresence(type: string, token: string): Promise<void>
         }
     });
 
-    if(vacation.length > 0) throw ErrorMsg.unprocessableEntity;
-
-    const presence = await prisma.presence.findMany({
+    const presence = await prisma.presence.findFirst({
         where: {
             userId: session!.id,
             date: currentTime
         }
     });
 
-    if(presence.length > 0) throw ErrorMsg.unprocessableEntity;
+    if(vacation || presence) throw ErrorMsg.unprocessableEntity;
 
     await prisma.presence.create({
         data: {
