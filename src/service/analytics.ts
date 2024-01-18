@@ -19,7 +19,8 @@ export async function todayState(token: string): Promise<{}> {
                         some: {
                             date: currentDay
                         }
-                    }
+                    },
+                    admin: false
                 }
             });
 
@@ -44,7 +45,8 @@ export async function todayState(token: string): Promise<{}> {
                                 gte: currentDay
                             }
                         }
-                    }
+                    },
+                    admin: false
                 }
             });
 
@@ -82,7 +84,8 @@ export async function todayState(token: string): Promise<{}> {
                                 }
                             }
                         ]
-                    }
+                    },
+                    admin: false
                 }
             });
 
@@ -110,6 +113,7 @@ export async function getCsv(year: string, month: string, token: string): Promis
     FROM User
     LEFT JOIN Presence ON User.id=Presence.userId AND (YEAR(Presence.date)=${year} AND MONTH(Presence.date)=${month})
     LEFT JOIN Vacation ON User.id=Vacation.userId AND (YEAR(Vacation.from)=${year} AND MONTH(Vacation.from)=${month})
+    WHERE User.admin=0
     GROUP BY User.id;`;
 
     return json2csv(data);
