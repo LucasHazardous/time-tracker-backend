@@ -3,18 +3,30 @@ import { authorizeAdmin, authorizeUser } from './user';
 import { holidayDays } from '../tools/free_days';
 import { ErrorMsg } from '../config/config';
 
-export async function createPresence(type: string, token: string): Promise<void> {
+export async function createCurrentUserPresence(type: string, token: string): Promise<void> {
     const session = await authorizeUser(token);
 
     const currentTime = new Date();
     currentTime.setUTCHours(0, 0, 0, 0);
 
-    if (currentTime.getDay() == 0 || currentTime.getDay() == 6) throw ErrorMsg.unprocessableEntity;
+    await createPresence(type, session!.id, currentTime);
+}
 
-    const freeDays = holidayDays(currentTime.getFullYear());
+export async function createPastUserPresence(type: string, date: Date, userId: string, token: string): Promise<void> {
+    await authorizeAdmin(token);
+
+    if(date > new Date()) throw ErrorMsg.unprocessableEntity;
+
+    await createPresence(type, userId, date);
+}
+
+async function createPresence(type: string, userId: string, date: Date): Promise<void> {
+    if (date.getDay() == 0 || date.getDay() == 6) throw ErrorMsg.unprocessableEntity;
+
+    const freeDays = holidayDays(date.getFullYear());
 
     for (const day of freeDays) {
-        if (currentTime.getDate() === day[0] && currentTime.getMonth() + 1 == day[1]) {
+        if (date.getDate() === day[0] && date.getMonth() + 1 == day[1]) {
             throw ErrorMsg.unprocessableEntity;
         }
     }
@@ -25,19 +37,19 @@ export async function createPresence(type: string, token: string): Promise<void>
         },
         where: {
             from: {
-                lte: currentTime
+                lte: date
             },
             to: {
-                gte: currentTime
+                gte: date
             },
-            userId: session!.id
+            userId
         }
     });
 
     const presence = await prisma.presence.findFirst({
         where: {
-            userId: session!.id,
-            date: currentTime
+            userId,
+            date: date
         }
     });
 
@@ -45,8 +57,8 @@ export async function createPresence(type: string, token: string): Promise<void>
 
     await prisma.presence.create({
         data: {
-            userId: session!.id,
-            date: currentTime,
+            userId,
+            date: date,
             type
         }
     });
