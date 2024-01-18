@@ -41,7 +41,7 @@ export async function createPresence(type: string, token: string): Promise<void>
         }
     });
 
-    if(vacation || presence) throw ErrorMsg.unprocessableEntity;
+    if(vacation || presence) throw ErrorMsg.alreadyExistsErrorMsg;
 
     await prisma.presence.create({
         data: {
