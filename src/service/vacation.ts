@@ -40,7 +40,17 @@ export async function createVacation(from: Date, to: Date, category: string, tok
         }
     });
 
-    if(interference) {
+    const interferencePresence = await prisma.presence.findFirst({
+        where: {
+            date: {
+                lte: to,
+                gte: from
+            },
+            userId: session.id
+        }
+    });
+
+    if(interference || interferencePresence) {
         throw ErrorMsg.alreadyExistsErrorMsg;
     }
 

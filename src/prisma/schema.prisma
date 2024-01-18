@@ -15,7 +15,7 @@ model User {
     admin    Boolean
 
     vacations Vacation[]
-    absences  Absence[]
+    presences  Presence[]
 }
 
 model Vacation {
@@ -30,9 +30,10 @@ model Vacation {
     days     Int
 }
 
-model Absence {
+model Presence {
     id   String   @id @default(uuid())
     date DateTime
+    type String
 
     userId String
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

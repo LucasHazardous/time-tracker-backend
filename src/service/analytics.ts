@@ -15,17 +15,18 @@ export async function todayState(token: string): Promise<{}> {
                     id: true,
                     username: true
                 }, where: {
-                    absences: {
+                    presences: {
                         some: {
                             date: currentDay
                         }
-                    }
+                    },
+                    admin: false
                 }
             });
 
             resolve(users.map(res => ({
                 ...res,
-                status: 'nieobecny'
+                status: 'obecny'
             })));
         }),
         new Promise(async (resolve, _) => {
@@ -44,13 +45,14 @@ export async function todayState(token: string): Promise<{}> {
                                 gte: currentDay
                             }
                         }
-                    }
+                    },
+                    admin: false
                 }
             });
 
             resolve(users.map(res => ({
                 ...res,
-                status: 'wakacje'
+                status: 'urlop'
             })));
         }),
         new Promise(async (resolve, _) => {
@@ -72,24 +74,24 @@ export async function todayState(token: string): Promise<{}> {
                                             gte: currentDay
                                         }
                                     }
-                                },
-
+                                }
                             },
                             {
-                                absences: {
+                                presences: {
                                     some: {
                                         date: currentDay
                                     }
                                 }
                             }
                         ]
-                    }
+                    },
+                    admin: false
                 }
             });
 
             resolve(users.map(res => ({
                 ...res,
-                status: 'obecny'
+                status: 'nieobecny'
             })));
         })
     ]);
@@ -104,13 +106,14 @@ export async function getCsv(year: string, month: string, token: string): Promis
 
     let data: {
         username: string,
-        absences: number,
+        presences: number,
         vacations: number
     }[] = await prisma.$queryRaw`
-    SELECT User.username AS username, COUNT(Absence.id) AS absences, CONVERT(COALESCE(SUM(Vacation.days), 0), INT) AS vacations
+    SELECT User.username AS username, COUNT(Presence.id) AS presences, CONVERT(COALESCE(SUM(Vacation.days), 0), INT) AS vacations
     FROM User
-    LEFT JOIN Absence ON User.id=Absence.userId AND (YEAR(Absence.date)=${year} AND MONTH(Absence.date)=${month})
+    LEFT JOIN Presence ON User.id=Presence.userId AND (YEAR(Presence.date)=${year} AND MONTH(Presence.date)=${month})
     LEFT JOIN Vacation ON User.id=Vacation.userId AND (YEAR(Vacation.from)=${year} AND MONTH(Vacation.from)=${month})
+    WHERE User.admin=0
     GROUP BY User.id;`;
 
     return json2csv(data);

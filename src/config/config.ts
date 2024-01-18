@@ -21,6 +21,11 @@ export const allowedVacationCategories = [
     "okolicznościowy"
 ];
 
+export const allowedPresenceCategories = [
+    "zdalnie",
+    "w biurze"
+];
+
 interface JwtTokenPayload {
     id: string,
     admin: boolean
