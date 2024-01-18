@@ -15,7 +15,7 @@ export async function todayState(token: string): Promise<{}> {
                     id: true,
                     username: true
                 }, where: {
-                    absences: {
+                    presences: {
                         some: {
                             date: currentDay
                         }
@@ -25,7 +25,7 @@ export async function todayState(token: string): Promise<{}> {
 
             resolve(users.map(res => ({
                 ...res,
-                status: 'nieobecny'
+                status: 'obecny'
             })));
         }),
         new Promise(async (resolve, _) => {
@@ -50,7 +50,7 @@ export async function todayState(token: string): Promise<{}> {
 
             resolve(users.map(res => ({
                 ...res,
-                status: 'wakacje'
+                status: 'urlop'
             })));
         }),
         new Promise(async (resolve, _) => {
@@ -72,11 +72,10 @@ export async function todayState(token: string): Promise<{}> {
                                             gte: currentDay
                                         }
                                     }
-                                },
-
+                                }
                             },
                             {
-                                absences: {
+                                presences: {
                                     some: {
                                         date: currentDay
                                     }
@@ -89,7 +88,7 @@ export async function todayState(token: string): Promise<{}> {
 
             resolve(users.map(res => ({
                 ...res,
-                status: 'obecny'
+                status: 'nieobecny'
             })));
         })
     ]);
