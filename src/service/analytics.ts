@@ -104,12 +104,12 @@ export async function getCsv(year: string, month: string, token: string): Promis
 
     let data: {
         username: string,
-        absences: number,
+        presences: number,
         vacations: number
     }[] = await prisma.$queryRaw`
-    SELECT User.username AS username, COUNT(Absence.id) AS absences, CONVERT(COALESCE(SUM(Vacation.days), 0), INT) AS vacations
+    SELECT User.username AS username, COUNT(Presence.id) AS presences, CONVERT(COALESCE(SUM(Vacation.days), 0), INT) AS vacations
     FROM User
-    LEFT JOIN Absence ON User.id=Absence.userId AND (YEAR(Absence.date)=${year} AND MONTH(Absence.date)=${month})
+    LEFT JOIN Presence ON User.id=Presence.userId AND (YEAR(Presence.date)=${year} AND MONTH(Presence.date)=${month})
     LEFT JOIN Vacation ON User.id=Vacation.userId AND (YEAR(Vacation.from)=${year} AND MONTH(Vacation.from)=${month})
     GROUP BY User.id;`;
 
