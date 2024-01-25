@@ -8,7 +8,8 @@
     "gp": "prisma generate && prisma db push",
     "compile": "tsc",
     "start": "node dist/app.js",
-    "docs": "npx apidoc -i src/api/ -o docs/"
+    "docs": "npx apidoc -i src/api/ -o docs/",
+    "wait-for-db": "sh -c 'until nmap -p 3306 mariadb | grep -q 'open'; do echo \"Waiting for MariaDB...\"; sleep 2; done'"
   },
   "keywords": [],
   "author": "",
