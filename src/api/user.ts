@@ -121,6 +121,7 @@ userRouter.put('/:id',
  * @apiSuccess {Object[]} data
  * @apiSuccess {Date} [data.date] **Presence** Single day of presence
  * @apiSuccess {String} [data.type] **Presence** Presence type
+ * @apiSuccess {String} [data.category] **Vacation** Category of vacation
  * @apiSuccess {Date} [data.from] **Vacation** Beginning of vacation range
  * @apiSuccess {Date} [data.to] **Vacation** End of vacation range
  * @apiSuccess {Number} [data.days] **Vacation** Number of vacation days used in vacation range
@@ -155,6 +156,7 @@ userRouter.get('/:year/:month',
  * @apiSuccess {Object[]} data
  * @apiSuccess {Date} [data.date] **Presence** Single day of presence
  * @apiSuccess {String} [data.type] **Presence** Presence type
+ * @apiSuccess {String} [data.category] **Vacation** Category of vacation
  * @apiSuccess {Date} [data.from] **Vacation** Beginning of vacation range
  * @apiSuccess {Date} [data.to] **Vacation** End of vacation range
  * @apiSuccess {Number} [data.days] **Vacation** Number of vacation days used in vacation range

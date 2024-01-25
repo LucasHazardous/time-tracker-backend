@@ -104,17 +104,14 @@ export async function todayState(token: string): Promise<{}> {
 export async function getCsv(year: string, month: string, token: string): Promise<string> {
     await authorizeAdmin(token);
 
-    let data: {
-        username: string,
-        presences: number,
-        vacations: number
-    }[] = await prisma.$queryRaw`
-    SELECT User.username AS username, COUNT(Presence.id) AS presences, CONVERT(COALESCE(SUM(Vacation.days), 0), INT) AS vacations
-    FROM User
-    LEFT JOIN Presence ON User.id=Presence.userId AND (YEAR(Presence.date)=${year} AND MONTH(Presence.date)=${month})
-    LEFT JOIN Vacation ON User.id=Vacation.userId AND (YEAR(Vacation.from)=${year} AND MONTH(Vacation.from)=${month})
-    WHERE User.admin=0
-    GROUP BY User.id;`;
-
-    return json2csv(data);
+    return json2csv(
+        await prisma.$queryRaw`
+            SELECT User.username AS username, COUNT(Presence.id) AS presences, CONVERT(COALESCE(SUM(Vacation.days), 0), INT) AS vacations
+            FROM User
+            LEFT JOIN Presence ON User.id=Presence.userId AND (YEAR(Presence.date)=${year} AND MONTH(Presence.date)=${month})
+            LEFT JOIN Vacation ON User.id=Vacation.userId AND (YEAR(Vacation.from)=${year} AND MONTH(Vacation.from)=${month})
+            WHERE User.admin=0
+            GROUP BY User.id;
+        `
+    );
 }
