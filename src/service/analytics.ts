@@ -17,7 +17,8 @@ export async function todayState(token: string): Promise<{}> {
                 }, where: {
                     presences: {
                         some: {
-                            date: currentDay
+                            date: currentDay,
+                            type: 'zdalnie'
                         }
                     },
                     admin: false
@@ -26,7 +27,28 @@ export async function todayState(token: string): Promise<{}> {
 
             resolve(users.map(res => ({
                 ...res,
-                status: 'obecny'
+                status: 'zdalnie'
+            })));
+        }),
+        new Promise(async (resolve, _) => {
+            const users = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    username: true
+                }, where: {
+                    presences: {
+                        some: {
+                            date: currentDay,
+                            type: 'w biurze'
+                        }
+                    },
+                    admin: false
+                }
+            });
+
+            resolve(users.map(res => ({
+                ...res,
+                status: 'w biurze'
             })));
         }),
         new Promise(async (resolve, _) => {
