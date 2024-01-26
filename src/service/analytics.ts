@@ -13,7 +13,12 @@ export async function todayState(token: string): Promise<{}> {
             const users = await prisma.user.findMany({
                 select: {
                     id: true,
-                    username: true
+                    username: true,
+                    presences: {
+                        select: {
+                            type: true
+                        }
+                    }
                 }, where: {
                     presences: {
                         some: {
