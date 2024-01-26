@@ -15,7 +15,11 @@ export async function createCurrentUserPresence(type: string, token: string): Pr
 export async function createPastUserPresence(type: string, date: Date, userId: string, token: string): Promise<void> {
     await authorizeAdmin(token);
 
-    if(date > new Date()) throw ErrorMsg.unprocessableEntity;
+    const currentDate = new Date();
+    currentDate.setUTCHours(0,0,0,0);
+    date.setUTCHours(0,0,0,0);
+
+    if(date > currentDate) throw ErrorMsg.unprocessableEntity;
 
     await createPresence(type, userId, date);
 }
