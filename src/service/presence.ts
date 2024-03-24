@@ -1,7 +1,8 @@
 import prisma from '../db/db';
 import { authorizeAdmin, authorizeUser } from './user';
 import { holidayDays } from '../tools/free_days';
-import { ErrorMsg } from '../config/config';
+import { ErrorMsg, prismaNotFoundError } from '../config/config';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export async function createCurrentUserPresence(type: string, token: string): Promise<void> {
     const session = await authorizeUser(token);
@@ -95,4 +96,24 @@ export async function deletePresence(userId: string, date: Date, token: string):
     });
 
     if(count === 0) throw ErrorMsg.notFound;
+}
+
+export async function editPresence(type: string, presenceId: string, token: string): Promise<void> {
+    await authorizeAdmin(token);
+
+    try {
+            await prisma.presence.update({
+        where: {
+            id: presenceId
+        },
+        data: {
+            type
+        }
+    });
+    } catch (err: any) {
+        if (err instanceof PrismaClientKnownRequestError && err.code === prismaNotFoundError) {
+            throw ErrorMsg.notFound;
+        }
+        throw err;
+    }
 }
