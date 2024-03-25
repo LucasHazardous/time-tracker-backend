@@ -1,7 +1,8 @@
 import prisma from '../db/db';
 import { authorizeAdmin, authorizeUser } from './user';
 import { convertNumbersToDate, countFreeDaysInMonth } from "../tools/free_days";
-import { ErrorMsg } from '../config/config';
+import { ErrorMsg, prismaNotFoundError } from '../config/config';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export async function deleteVacation(date: Date, userId: string, token: string): Promise<void> {
     await authorizeAdmin(token);
@@ -18,11 +19,11 @@ export async function deleteVacation(date: Date, userId: string, token: string):
         }
     });
 
-    if(count === 0) throw ErrorMsg.notFound;
+    if (count === 0) throw ErrorMsg.notFound;
 }
 
 export async function createVacation(from: Date, to: Date, category: string, token: string): Promise<number> {
-    if(!normalizeValidateDates(from, to)) {
+    if (!normalizeValidateDates(from, to)) {
         throw ErrorMsg.unprocessableEntity;
     }
 
@@ -50,7 +51,7 @@ export async function createVacation(from: Date, to: Date, category: string, tok
         }
     });
 
-    if(interference || interferencePresence) {
+    if (interference || interferencePresence) {
         throw ErrorMsg.alreadyExistsErrorMsg;
     }
 
@@ -69,7 +70,7 @@ export async function createVacation(from: Date, to: Date, category: string, tok
             holiday += holidayDays;
             count -= holidayDays;
 
-            if(count > 0) {
+            if (count > 0) {
                 await prisma.vacation.create({
                     data: {
                         userId: session!.id,
@@ -94,7 +95,7 @@ export async function createVacation(from: Date, to: Date, category: string, tok
     holiday += holidayDays;
     count -= holidayDays;
 
-    if(count > 0) {
+    if (count > 0) {
         await prisma.vacation.create({
             data: {
                 userId: session!.id,
@@ -112,11 +113,11 @@ export async function createVacation(from: Date, to: Date, category: string, tok
 }
 
 function normalizeValidateDates(from: Date, to: Date): boolean {
-    from.setUTCHours(0,0,0,0);
-    to.setUTCHours(0,0,0,0);
+    from.setUTCHours(0, 0, 0, 0);
+    to.setUTCHours(0, 0, 0, 0);
 
     const currentDay = new Date();
-    currentDay.setUTCHours(0,0,0,0);
+    currentDay.setUTCHours(0, 0, 0, 0);
 
     return currentDay <= from && from <= to;
 }
@@ -131,4 +132,25 @@ function removeHourFromDate(date: Date): Date {
     const newDate = new Date(date);
     newDate.setUTCHours(0, 0, 0, 0);
     return newDate;
+}
+
+
+export async function editVacation(category: string, vacationId: string, token: string): Promise<void> {
+    await authorizeAdmin(token);
+
+    try {
+        await prisma.vacation.update({
+            where: {
+                id: vacationId
+            },
+            data: {
+                category
+            }
+        });
+    } catch (err: any) {
+        if (err instanceof PrismaClientKnownRequestError && err.code === prismaNotFoundError) {
+            throw ErrorMsg.notFound;
+        }
+        throw err;
+    }
 }

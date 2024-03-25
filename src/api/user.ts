@@ -119,6 +119,7 @@ userRouter.put('/:id',
  * @apiParam {Number} month
  * 
  * @apiSuccess {Object[]} data
+ * @apiSuccess {String} [data.id] Id of presence/vacation
  * @apiSuccess {Date} [data.date] **Presence** Single day of presence
  * @apiSuccess {String} [data.type] **Presence** Presence type
  * @apiSuccess {String} [data.category] **Vacation** Category of vacation
@@ -154,6 +155,7 @@ userRouter.get('/:year/:month',
  * @apiParam {String} id User id
  * 
  * @apiSuccess {Object[]} data
+ * @apiSuccess {String} [data.id] Id of presence/vacation
  * @apiSuccess {Date} [data.date] **Presence** Single day of presence
  * @apiSuccess {String} [data.type] **Presence** Presence type
  * @apiSuccess {String} [data.category] **Vacation** Category of vacation

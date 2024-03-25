@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 const presenceRouter = express.Router();
 
-import { body, header } from 'express-validator';
+import { body, header, param } from 'express-validator';
 import { sendErrorStatusCode, handleValidationError } from '../error/api';
-import { createCurrentUserPresence, presencePresent, deletePresence, createPastUserPresence } from "../service/presence";
+import { createCurrentUserPresence, presencePresent, deletePresence, createPastUserPresence, editPresence } from "../service/presence";
 import { allowedPresenceCategories } from "../config/config";
 
 /**
@@ -72,6 +72,31 @@ presenceRouter.post('/',
     const token = req.get("Authorization")!.substring(7);
 
     createPastUserPresence(req.body.type, new Date(req.body.date), req.body.userId, token)
+      .then(() => res.sendStatus(200))
+      .catch((err) => sendErrorStatusCode(err, res));
+  }
+);
+
+/**
+ * @api {put} /presence/:id Edit past presence
+ * @apiGroup Presence
+ * @apiPermission Admin
+ *  
+ * @apiHeader {String} authorization Authorization
+ * @apiParam {String} id
+ * @apiBody {String} type Presence type
+ * 
+ */
+presenceRouter.put('/:id',
+  header("Authorization").isString().contains("Bearer"),
+  param("id").isString().isUUID(),
+  body("type").isString().isIn(allowedPresenceCategories),
+  (req: Request, res: Response) => {
+    if (handleValidationError(req, res)) return;
+
+    const token = req.get("Authorization")!.substring(7);
+
+    editPresence(req.body.type, req.params.id, token)
       .then(() => res.sendStatus(200))
       .catch((err) => sendErrorStatusCode(err, res));
   }
